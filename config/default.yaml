@@ -7,7 +7,11 @@ homeserverUrl: "https://matrix.org"
 accessToken: "YOUR_TOKEN_HERE"
 
 # Whether or not to autojoin rooms when invited.
-autoJoin: true
+autoJoin: false
 
 # Location on disk for where to store various bot information.
 dataPath: "storage"
+
+profile:
+    displayname: "Zammad Bot"
+    avatar: true

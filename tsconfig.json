@@ -4,9 +4,10 @@
         "emitDecoratorMetadata": true,
         "module": "commonjs",
         "moduleResolution": "node",
-        "target": "es2015",
+        "target": "ES2019",
         "noImplicitAny": false,
         "sourceMap": true,
+        "incremental": true,
         "outDir": "./lib",
         "types": [
             "node"
