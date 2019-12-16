@@ -6,10 +6,18 @@ export interface IZammadTicket {
     group_id: number,
     state_id: number,
     customer_id: number,
+    customer: string;
     note: string,
     updated_at: number,
     created_at: number,
     number: string,
+}
+
+export interface IZammadUser {
+    id: number;
+    firstname: string;
+    lastname: string;
+    email: string;
 }
 
 export class ZammadClient {
@@ -33,6 +41,16 @@ export class ZammadClient {
                 updated_at: Date.parse(t.updated_at),
                 created_at: Date.parse(t.created_at),
             }
+        });
+    }
+
+    public async getUser(userId: number): Promise<IZammadUser> {
+        const uri = `${this.url}/api/v1/users/${userId}`;
+        return request.get(uri, {
+            headers: {
+                "Authorization": `Token token=${this.accessToken}`,
+            },
+            json: true,
         });
     }
 }
