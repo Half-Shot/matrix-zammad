@@ -2,6 +2,12 @@
 
 A bot for forwarding Zammad ticket notifications into Matrix.
 
+## What is Zammad?
+
+> [Zammad](https://zammad.org/) is a web-based, open source user support/ticketing solution.
+
+ - https://zammad.org/
+
 ## Features
 
 - Notifies on new ticket creation in a given group
