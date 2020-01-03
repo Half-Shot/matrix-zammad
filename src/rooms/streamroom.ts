@@ -82,8 +82,9 @@ export class StreamRoom implements ZammadRoom {
                 try {
                     LogService.info("StreamRoom", `Attempting to close ticket ${ticket.number}`);
                     await puppet.closeTicket(ticket.id);
+                    await this.client.sendNotice(this.roomId, `Closed #${ticket.number}`);
                 } catch (ex) {
-                    this.client.sendNotice(this.roomId, `Failed to close ticket ${ticket.number}: ${ex}`);
+                    await this.client.sendNotice(this.roomId, `Failed to close ticket ${ticket.number}: ${ex}`);
                 }
             }
         } catch (ex) {
