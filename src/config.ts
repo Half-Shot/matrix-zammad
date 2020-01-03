@@ -13,6 +13,9 @@ interface IConfig {
         url: string;
         accessToken: string;
     }
+    sender_tokens: {
+        [userId: string]: string;
+    }
     rooms: string[];
 }
 

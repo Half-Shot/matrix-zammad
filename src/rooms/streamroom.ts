@@ -1,6 +1,7 @@
 import { ZammadRoom, IRoomConfig } from "./room";
 import { MatrixClient, LogService } from "matrix-bot-sdk";
 import { ZammadClient, IZammadTicket } from "../zammad/ZammadClient";
+import { PuppetFactory } from "../puppetFactory";
 
 
 const MIN_POLL_INTERVAL = 10000;
@@ -12,7 +13,8 @@ export class StreamRoom implements ZammadRoom {
 
     private config: IRoomConfig;
     private lastNewTicketId = 0;
-    constructor(public readonly roomId: string, private readonly client: MatrixClient, private readonly zammad: ZammadClient) {
+    constructor(public readonly roomId: string, private readonly client: MatrixClient,
+        private readonly zammad: ZammadClient, private readonly puppetFactory: PuppetFactory) {
 
     }
 
@@ -54,6 +56,42 @@ export class StreamRoom implements ZammadRoom {
         }, this.config.pollInterval);
     }
 
+    public async onReaction(sender: string, key: string, eventId: string) {
+        const puppet = this.puppetFactory.getPuppet(sender);
+        if (!puppet) {
+            return;
+        }
+        const actionAliases = {
+            "close": ["❌", "🚮"]
+        }
+        const action = Object.keys(actionAliases).find((act) => actionAliases[act].includes(key));
+
+        if (!action) {
+            LogService.info("StreamRoom", `Did not understand reaction key ${key}`);
+            return;
+        }
+
+        try {
+            const event = await this.client.getEvent(this.roomId, eventId);
+            const ticket = event.content["uk.half-shot.zammad.ticket"];
+            if (!ticket || ticket.number) {
+                LogService.info("StreamRoom", `Reaction was not made against a ticket`);
+                return;
+            }
+            if (action === "close") {
+                try {
+                    LogService.info("StreamRoom", `Attempting to close ticket ${ticket.number}`);
+                    await puppet.closeTicket(ticket.id);
+                } catch (ex) {
+                    this.client.sendNotice(this.roomId, `Failed to close ticket ${ticket.number}: ${ex}`);
+                }
+            }
+        } catch (ex) {
+            LogService.warn("StreamRoom", `Could not get referenced event: ${eventId}`);
+            return;
+        }
+    }
+
     private async ticketPoll(initial = false) {
         LogService.info("StreamRoom", `Polling for tickets`);
         const tickets = await this.zammad.getTickets(this.config.groupId);
@@ -73,10 +111,14 @@ export class StreamRoom implements ZammadRoom {
 
     private async handleNewTicket(ticket: IZammadTicket) {
         return this.client.sendMessage(this.roomId, {
+            "uk.half-shot.zammad.ticket": {
+                number: ticket.number,
+                id: ticket.id,
+            },
             msgtype: "m.notice",
             body: `New Ticket #${ticket.number}: ${ticket.title}`,
             format: "org.matrix.custom.html",
-            formatted_body: `<b>New Ticket</b> <a href="${this.zammad.url}/#ticket/zoom/${ticket.id}">#${ticket.number}</a>: <p>${ticket.title}</p>`,
+            formatted_body: `<b>New Ticket</b> <a href="${this.zammad.url}/#ticket/zoom/${ticket.id}">#${ticket.number}</a>:<p>${ticket.title}</p>`,
         });
     }
 

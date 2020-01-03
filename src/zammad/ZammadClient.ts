@@ -44,6 +44,30 @@ export class ZammadClient {
         });
     }
 
+    public async getTicket(id: number): Promise<IZammadTicket> {
+        const uri = `${this.url}/api/v1/tickets/${id}`;
+        return request.get(uri, {
+            headers: {
+                "Authorization": `Token token=${this.accessToken}`,
+            },
+            json: true
+        });
+    }
+
+    public async closeTicket(id: number) {
+        const ticket = await this.getTicket(id);
+        // XXX: Hardcoded state
+        ticket.state_id = 4;
+        const uri = `${this.url}/api/v1/tickets/${id}`;
+        const result = await request.put(uri, {
+            headers: {
+                "Authorization": `Token token=${this.accessToken}`,
+            },
+            json: ticket,
+        });
+        return result;
+    }
+
     public async getUser(userId: number): Promise<IZammadUser> {
         const uri = `${this.url}/api/v1/users/${userId}`;
         return request.get(uri, {
