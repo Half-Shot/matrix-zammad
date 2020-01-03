@@ -74,13 +74,13 @@ export class StreamRoom implements ZammadRoom {
         try {
             const event = await this.client.getEvent(this.roomId, eventId);
             const ticket = event.content["uk.half-shot.zammad.ticket"];
-            if (!ticket || ticket.number) {
+            if (!ticket || ticket.id === undefined) {
                 LogService.info("StreamRoom", `Reaction was not made against a ticket`);
                 return;
             }
             if (action === "close") {
                 try {
-                    LogService.info("StreamRoom", `Attempting to close ticket ${ticket.number}`);
+                    LogService.info("StreamRoom", `Attempting to close ticket ${ticket.id}`);
                     await puppet.closeTicket(ticket.id);
                     await this.client.sendNotice(this.roomId, `Closed #${ticket.number}`);
                 } catch (ex) {
