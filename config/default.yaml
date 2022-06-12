@@ -15,3 +15,17 @@ dataPath: "storage"
 profile:
     displayname: "Zammad Bot"
     avatar: true
+
+# Generate a personal access within Zammad to use it with the bot.
+# https://user-docs.zammad.org/en/latest/extras/profile-and-settings.html
+zammad:
+    url: "https://example.com"
+    accessToken: "YOUR_PERSONAL_ZAMMAD_API_TOKEN"
+    
+# The ID of you matrix room(s) you want to receive Zammad's ticket
+# notifications.
+rooms:
+    - "ID_OF_RECEIVING_MATRIX_ROOM"
+
+sender_tokens:
+    - "YOUR_USER_ID": "YOUR_SENDER_TOKEN"
