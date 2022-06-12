@@ -34,12 +34,12 @@ The bot uses Matrix room state for configuration. To setup a room (in Riot):
 
 - Open the room that you wish to connect the bot to.
 - Invite the bot.
-- Add a new state event `uk.half-shot.matrix-zammad.roominfo` with the content:
+- Add a new state event (send `/devtools` to a room in Element) `uk.half-shot.matrix-zammad.roominfo` with the content:
 
 ```js
 {
     "type": "stream",
-    "pollInterval": 10000 // ms to wait between fetches for tickets.
+    "pollInterval": 10000, // ms to wait between fetches for tickets.
     "groupId": 2 // The group_id you wish to fetch the tickets of. See https://docs.zammad.org/en/latest/api-group.html#list to find your group.
 }
 ```
